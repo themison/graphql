@@ -1,68 +1,66 @@
 import graphene
 from graphene_django import DjangoObjectType
-from django.db import models
+from django.db.models import Q
 
 from .models import Pizza
-
-class PizzaType(DjangoObjectType):
-    class Meta:
-        model = Pizza
+from .types import PizzaType
 
 
 class CreatePizza(graphene.Mutation):
-    id = graphene.ID()
-    name = graphene.String()
-    price = graphene.Int()
+    pizza = graphene.Field(PizzaType)
 
     class Arguments:
-        name = graphene.String()
-        price = graphene.Int()
+        name = graphene.String(required=True)
+        price = graphene.Int(required=True)
+        description = graphene.String(required=True)
     
-    def mutate(self, info, name, price):
-        pizza = Pizza(name = name, price = price)
+    def mutate(self, info, name, price, description):
+        pizza = Pizza(
+            name=name,
+            price=price,
+            description=description
+        )
         pizza.save()
 
-        return CreatePizza(
-            id = pizza.id,
-            name = pizza.name,
-            price = pizza.price,
-        )
+        return CreatePizza(pizza=pizza)
+
 
 class UpdatePizza(graphene.Mutation):
-    id = graphene.Int()
-    name = graphene.String()
-    price = graphene.Int()
+    pizza = graphene.Field(PizzaType)
 
-    class Arguments:
-        id = graphene.Int()
+    class Arguments:    
+        id = graphene.ID(required=True)
         name = graphene.String()
+        price = graphene.Int()
+        description = graphene.String()
     
-    def mutate(self, info, id, name, price):
-        pizza = Pizza(name = name, price = price)
+    def mutate(self, info, id, name=None, price=None, description=None):
+        pizza = Pizza.objects.get(id=id)
+
+        if name:
+            pizza.name = name
+        if price:
+            pizza.price = price
+        if description:
+            pizza.description = description
         pizza.save()
-        return UpdatePizza(
-            id = pizza.id,
-            name = pizza.name,
-            price = pizza.price)
-      
+        print(123)
+
+        return UpdatePizza(pizza=pizza)
+
+
 
 class DeletePizza(graphene.Mutation):
-    id = graphene.Int()
-    name = graphene.String()
-    price = graphene.Int()
+    pizza = graphene.Field(PizzaType)
 
     class Arguments:
         id = graphene.Int()
     
     def mutate(self, info, id):
-        pizza = Pizza(id = id)
+        pizza = Pizza.objects.get(id=id)
         pizza.delete()
-        return DeletePizza(
-            id = pizza.id,
-            name = pizza.name,
-            price = pizza.price,
-        )
 
+    # return ("Pizza was deleted")
 
 
 class Mutation(graphene.ObjectType):

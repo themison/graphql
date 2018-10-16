@@ -1,23 +1,34 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.db import models
+
 from django.db.models import Q
 
 from .models import Pizza
-
-class PizzaType(DjangoObjectType):
-    class Meta:
-        model = Pizza
+from .types import PizzaType
 
 class Query(graphene.ObjectType):
     pizza = graphene.List(
         PizzaType,
         name = graphene.String(),
-        id = graphene.ID(),)
+        id = graphene.ID(),
+        first=graphene.Int(),
+        skip=graphene.Int(),
+        )
 
-    def resolve_pizza(self, info, name=None, id=None, **kwargs):
+    def resolve_pizza(self, info, first=None, skip=None, name=None, id=None, **kwargs):
+        show = Pizza.objects.all()
+        
         if name:
-            return Pizza.objects.filter(Q(name__icontains = name))
+            show = show.filter(Q(name__icontains = name))
         if id:
-            return Pizza.objects.filter(Q(id__icontains = id))
-        return Pizza.objects.all()
+            show = show.filter(Q(name__icontains = id))
+        
+        if skip:
+            show = show[skip::]
+        
+        if first:
+            show = show[:first]
+        
+        return show
+        
