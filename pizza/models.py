@@ -3,7 +3,6 @@ from django.conf import settings
 from .helper import secret
 # Create your models here.
 
-
 class Pizza(models.Model):
     name = models.CharField(max_length=12)
     price = models.IntegerField()

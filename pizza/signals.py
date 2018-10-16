@@ -1,4 +1,4 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from .models import Pizza
 
@@ -6,5 +6,10 @@ from .helper import secret
 
 
 @receiver(pre_save, sender=Pizza)
-def saveBitch(sender, **kwargs):
-    print (123213321)
+def pizzaPre(sender, instance, **kwargs):
+    instance.secretKey = secret()
+
+@receiver(post_save, sender=Pizza)
+def pizzaPost(sender, instance, created, **kwargs):
+    print(instance.secretKey)
+
