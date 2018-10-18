@@ -1,6 +1,5 @@
-import random
+from django.utils.crypto import get_random_string
 
 def secret():
-    hash = random.sample('123456789qwertyuiopasdfghjklzxcvbnm', 10)
-    str = ''.join(hash)
-    return str
+    hash = get_random_string(length=10)
+    return hash

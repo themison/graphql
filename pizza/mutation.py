@@ -1,10 +1,10 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.db.models import Q
+from graphql_jwt.decorators import login_required
 
 from .models import Pizza
 from .types import PizzaType
-
 
 class CreatePizza(graphene.Mutation):
     pizza = graphene.Field(PizzaType)
@@ -14,6 +14,7 @@ class CreatePizza(graphene.Mutation):
         price = graphene.Int(required=True)
         description = graphene.String(required=True)
     
+    @login_required
     def mutate(self, info, name, price, description):
         pizza = Pizza(
             name=name,
@@ -33,7 +34,7 @@ class UpdatePizza(graphene.Mutation):
         name = graphene.String()
         price = graphene.Int()
         description = graphene.String()
-    
+    @login_required
     def mutate(self, info, id, name=None, price=None, description=None):
         pizza = Pizza.objects.get(id=id)
 
@@ -56,6 +57,7 @@ class DeletePizza(graphene.Mutation):
     class Arguments:
         id = graphene.Int()
     
+    @login_required
     def mutate(self, info, id):
         pizza = Pizza.objects.get(id=id)
         pizza.delete()

@@ -7,9 +7,9 @@ from .helper import secret
 
 @receiver(pre_save, sender=Pizza)
 def pizzaPre(sender, instance, **kwargs):
-    instance.secretKey = secret()
+    instance.secret_key = secret()
 
 @receiver(post_save, sender=Pizza)
 def pizzaPost(sender, instance, created, **kwargs):
-    print(instance.secretKey)
+    print(instance.secret_key)
 

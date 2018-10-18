@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.db import models
-
+from graphql_jwt.decorators import login_required
 from django.db.models import Q
 
 from .models import Pizza
@@ -15,7 +15,8 @@ class Query(graphene.ObjectType):
         first=graphene.Int(),
         skip=graphene.Int(),
         )
-
+        
+    @login_required
     def resolve_pizza(self, info, first=None, skip=None, name=None, id=None, **kwargs):
         show = Pizza.objects.all()
         
